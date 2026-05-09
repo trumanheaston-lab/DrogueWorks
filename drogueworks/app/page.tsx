@@ -65,8 +65,8 @@ export default function Home() {
       >
         {/* Left: headline */}
         <div className="pt-8">
-          <div className="mono flex items-center gap-[10px] text-[10px] text-[var(--gray)] tracking-[0.2em] uppercase mb-6">
-            <span className="inline-block w-5 h-px bg-[var(--gray)]" />
+          <div className="mono flex items-center gap-[10px] text-[10px] text-[var(--white)] tracking-[0.2em] uppercase mb-6">
+            <span className="inline-block w-5 h-px bg-[var(--white)]" />
             Mission Manifest / FY-2026
           </div>
           <h1
@@ -77,9 +77,9 @@ export default function Home() {
             <br />
             3D PRINTED
             <br />
-            <span className="text-[var(--gray)] font-light">AVIONICS SLEDS.</span>
+            <span className="text-[var(--white)] font-light">AVIONICS SLEDS.</span>
           </h1>
-          <p className="text-[14px] text-[var(--gray)] leading-[1.8] max-w-[440px] mb-6">
+          <p className="text-[14px] text-[var(--white)] leading-[1.8] max-w-[440px] mb-6">
             Parametric altimeter sled configurator for high-power rocketry. Submit your airframe
             specs and flight profile — we machine to your tolerances.
           </p>
@@ -102,7 +102,7 @@ export default function Home() {
         <div className="pt-8">
           <div className="blueprint-grid border border-[var(--border-2)] p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="mono text-[10px] text-[var(--gray)] tracking-[0.15em] uppercase">
+              <span className="mono text-[10px] text-[var(--white)] tracking-[0.15em] uppercase">
                 Active Configuration
               </span>
               <span className="mono text-[9px] text-[#4ade80] border border-[rgba(74,222,128,0.3)] px-[6px] py-[2px] tracking-[0.1em]">
@@ -121,7 +121,7 @@ export default function Home() {
                 key={k}
                 className="flex justify-between items-center border-b border-[var(--border)] pb-2 last:border-0 last:pb-0"
               >
-                <span className="mono text-[11px] text-[var(--gray)]">{k}</span>
+                <span className="mono text-[11px] text-[var(--white)]">{k}</span>
                 <span className="mono text-[12px] text-white font-medium">{v}</span>
               </div>
             ))}
@@ -157,10 +157,10 @@ export default function Home() {
           >
             DROGUEWORKS
           </div>
-          <div className="mono text-[10px] text-[var(--gray)]">
+          <div className="mono text-[10px] text-[var(--white)]">
             Parametric hardware for high-power rocketry
           </div>
-          <div className="mono text-[10px] text-[var(--gray-2)] mt-1">
+          <div className="mono text-[10px] text-[var(--white-2)] mt-1">
             © {new Date().getFullYear()} DrogueWorks. Built for the range, not the shelf.
           </div>
         </div>
@@ -173,11 +173,11 @@ export default function Home() {
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mono text-[10px] text-[var(--gray)] hover:text-white transition-colors duration-200 no-underline"
+            className="mono text-[10px] text-[var(--white)] hover:text-white transition-colors duration-200 no-underline"
           >
             github.com/drogueworks →
           </a>
-          <div className="mono text-[9px] text-[var(--gray-2)] mt-1">
+          <div className="mono text-[9px] text-[var(--white-2)] mt-1">
             v1.0.0 — Sonnet-4 / CadQuery / Next.js
           </div>
         </div>
