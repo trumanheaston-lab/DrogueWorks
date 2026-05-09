@@ -1,0 +1,340 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── DESIGN TOKENS ──────────────────────────────────────────── */
+:root {
+  --bg:        #050505;
+  --bg-1:      #0a0a0a;
+  --bg-2:      #111111;
+  --bg-3:      #1a1a1a;
+  --white:     #ffffff;
+  --gray:      #888888;
+  --gray-2:    #555555;
+  --gray-3:    #333333;
+  --green:     #4ade80;
+  --border:    rgba(255, 255, 255, 0.08);
+  --border-2:  rgba(255, 255, 255, 0.15);
+  --border-3:  rgba(255, 255, 255, 0.35);
+  --glass:     rgba(255, 255, 255, 0.03);
+}
+
+/* ─── BASE ───────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── CUSTOM SCROLLBARS ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-3);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-2);
+}
+
+/* Terminal / log panels get ultra-thin scrollbars */
+.terminal-scroll::-webkit-scrollbar {
+  width: 2px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: var(--gray-3);
+}
+
+/* ─── GLASS MORPHISM ─────────────────────────────────────────── */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-2);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* ─── MONO UTILITY ───────────────────────────────────────────── */
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── TACTICAL BUTTON (flight-control surface) ───────────────── */
+.btn-tactical {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--white);
+  color: var(--bg);
+  border: none;
+  border-radius: 0;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-tactical:hover {
+  background: #d4d4d4;
+}
+
+.btn-tactical:active {
+  transform: scale(0.98);
+}
+
+.btn-tactical:disabled {
+  background: var(--gray-3);
+  color: var(--gray-2);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ghost variant */
+.btn-ghost {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--gray);
+  border: 1px solid var(--border-2);
+  border-radius: 0;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-3);
+  color: var(--white);
+}
+
+/* ─── FORM FIELDS ─────────────────────────────────────────────── */
+.field-input,
+.field-select,
+.field-textarea {
+  background: var(--bg-1);
+  border: 1px solid var(--border-2);
+  color: var(--white);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+  outline: none;
+  border-radius: 0;
+  width: 100%;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+  border-color: var(--border-3);
+  background: var(--bg-2);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--gray-2);
+}
+
+.field-input.error,
+.field-select.error,
+.field-textarea.error {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.field-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.field-select option {
+  background: var(--bg-2);
+  color: var(--white);
+}
+
+.field-textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.75;
+}
+
+/* ─── RANGE SLIDERS ──────────────────────────────────────────── */
+input[type='range'] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1px;
+  background: var(--border-2);
+  outline: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--white);
+  border-radius: 0;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.4);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--white);
+  border-radius: 0;
+  border: none;
+  cursor: pointer;
+}
+
+input[type='range']:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* ─── STATUS DOT PULSE ───────────────────────────────────────── */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.status-pulse {
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* ─── TERMINAL CURSOR BLINK ──────────────────────────────────── */
+@keyframes termBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.term-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 13px;
+  background: var(--green);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: termBlink 1s step-end infinite;
+}
+
+/* ─── LOG ENTRY SLIDE-IN ─────────────────────────────────────── */
+@keyframes logSlide {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.log-entry-new {
+  animation: logSlide 0.25s ease forwards;
+}
+
+/* ─── DATA READOUT TICK ──────────────────────────────────────── */
+@keyframes readoutTick {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.readout-live {
+  animation: readoutTick 0.4s ease;
+}
+
+/* ─── SECTION REVEAL ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+/* ─── HERO TERMINAL STREAM ───────────────────────────────────── */
+@keyframes streamFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.stream-line {
+  animation: streamFade 0.3s ease forwards;
+}
+
+/* ─── GRID FLOOR (blueprint background) ─────────────────────── */
+.blueprint-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── HEADER BLUR ─────────────────────────────────────────────── */
+.header-blur {
+  background: rgba(5, 5, 5, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ─── PANEL DIVIDER ──────────────────────────────────────────── */
+.panel-divider {
+  border-top: 1px solid var(--border);
+}
+
+/* ─── READOUT VALUE FLASH ─────────────────────────────────────── */
+.value-flash {
+  transition: color 0.2s;
+}
+
+.value-flash.updating {
+  color: var(--green);
+}
