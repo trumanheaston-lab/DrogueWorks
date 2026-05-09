@@ -75,9 +75,9 @@ export default function Home() {
           >
             PRECISION
             <br />
-            HARDWARE
+            3D PRINTED
             <br />
-            <span className="text-[var(--gray)] font-light">ON DEMAND.</span>
+            <span className="text-[var(--gray)] font-light">AVIONICS SLEDS.</span>
           </h1>
           <p className="text-[14px] text-[var(--gray)] leading-[1.8] max-w-[440px] mb-6">
             Parametric altimeter sled configurator for high-power rocketry. Submit your airframe
