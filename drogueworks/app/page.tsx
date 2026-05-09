@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 
-// ── Formspree endpoint — replace with your ID ─────────────────
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? ''
 
-// ── Terminal stream messages ──────────────────────────────────
 const STREAM = [
   '[GEOMETRY_ENGINE_STANDBY]',
   '[AWAITING_PILOT_INPUT]',
@@ -50,8 +49,6 @@ const PRODUCTS = [
   },
 ]
 
-type MultiKey = 'altimeters' | 'other_hardware'
-
 interface FormState {
   email: string
   sled_size: string
@@ -60,49 +57,37 @@ interface FormState {
   other_hardware: string[]
 }
 
-const EMPTY_FORM: FormState = {
-  email: '',
-  sled_size: '',
-  altimeters: [],
-  price_range: '',
-  other_hardware: [],
-}
+const EMPTY: FormState = { email: '', sled_size: '', altimeters: [], price_range: '', other_hardware: [] }
 
 export default function ComingSoonPage() {
-  const [form, setForm] = useState<FormState>(EMPTY_FORM)
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
+  const [form, setForm] = useState<FormState>(EMPTY)
+  const [errors, setErrors] = useState<Partial<Record<keyof FormState | '_form', string>>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [streamLines, setStreamLines] = useState<string[]>([STREAM[0], STREAM[1]])
+  const [streamLines, setStreamLines] = useState([STREAM[0], STREAM[1]])
   const [visible, setVisible] = useState(false)
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  const [cd, setCd] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const streamIdx = useRef(2)
 
-  // Fade in
   useEffect(() => { setTimeout(() => setVisible(true), 60) }, [])
 
-  // Terminal stream
   useEffect(() => {
     const id = setInterval(() => {
       const msg = STREAM[streamIdx.current % STREAM.length]
       streamIdx.current++
-      setStreamLines(prev => {
-        const next = [...prev, msg]
-        return next.length > 6 ? next.slice(-6) : next
-      })
+      setStreamLines(p => { const n = [...p, msg]; return n.length > 5 ? n.slice(-5) : n })
     }, 2400)
     return () => clearInterval(id)
   }, [])
 
-  // Countdown to June 1 2026
   useEffect(() => {
     const target = new Date('2026-06-01T00:00:00Z').getTime()
     const tick = () => {
       const diff = target - Date.now()
       if (diff <= 0) return
-      setCountdown({
-        days:    Math.floor(diff / 86400000),
-        hours:   Math.floor((diff % 86400000) / 3600000),
+      setCd({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
         minutes: Math.floor((diff % 3600000) / 60000),
         seconds: Math.floor((diff % 60000) / 1000),
       })
@@ -112,17 +97,13 @@ export default function ComingSoonPage() {
     return () => clearInterval(id)
   }, [])
 
-  const toggleMulti = (key: MultiKey, val: string) => {
-    setForm(prev => {
-      const arr = prev[key]
-      return { ...prev, [key]: arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val] }
-    })
-  }
+  const toggleMulti = (key: 'altimeters' | 'other_hardware', val: string) =>
+    setForm(p => ({ ...p, [key]: p[key].includes(val) ? p[key].filter(v => v !== val) : [...p[key], val] }))
 
-  const validate = (): boolean => {
-    const e: Partial<Record<keyof FormState, string>> = {}
+  const validate = () => {
+    const e: typeof errors = {}
     if (!form.email || !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Valid email required'
-    if (!form.sled_size)  e.sled_size  = 'Please select a size'
+    if (!form.sled_size) e.sled_size = 'Please select a size'
     if (!form.price_range) e.price_range = 'Please select a range'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -146,445 +127,366 @@ export default function ComingSoonPage() {
       }
       setSubmitted(true)
     } catch {
-      setErrors({ email: 'Submission failed — please try again.' })
+      setErrors({ _form: 'Submission failed — please try again.' })
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div style={{ background: '#050505', minHeight: '100vh', color: '#fff', fontFamily: "'Barlow', sans-serif" }}>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:#050505;color:#fff;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#050505}::-webkit-scrollbar-thumb{background:#222}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes glow{0%,100%{box-shadow:0 0 0 rgba(74,222,128,0)}50%{box-shadow:0 0 20px rgba(74,222,128,.12)}}
+        .mono{font-family:'JetBrains Mono',monospace}
 
-      {/* ── HEADER ──────────────────────────────────────────── */}
-      <header style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 2rem',
-        background: 'rgba(5,5,5,0.9)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '0.15em', textTransform: 'uppercase' }}>DROGUE</span>
-          <span style={{ fontWeight: 300, fontSize: 15, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#888' }}>WORKS</span>
-        </div>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.1em' }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', animation: 'pulse 2s infinite', display: 'inline-block' }} />
-          SYSTEMS NOMINAL
+        /* HEADER */
+        .hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;background:rgba(5,5,5,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+        .hdr-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+        .hdr-wm{display:flex;align-items:baseline}
+        .hdr-b{font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+        .hdr-l{font-weight:300;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#555}
+        .hdr-status{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4ade80;display:flex;align-items:center;gap:6px;letter-spacing:.1em}
+        .sdot{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;flex-shrink:0}
+
+        /* HERO */
+        .hero{padding:96px 1.25rem 48px;max-width:1080px;margin:0 auto;opacity:0;transition:opacity .7s ease}
+        .hero.vis{opacity:1}
+        .hero-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;letter-spacing:.2em;text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+        .hero-lbl::before{content:'';display:inline-block;width:20px;height:1px;background:#333}
+        .hero-grid{display:grid;grid-template-columns:1fr auto;gap:2.5rem;align-items:start}
+        .hero-h1{font-size:clamp(1.9rem,5.5vw,3.6rem);font-weight:800;line-height:1.0;letter-spacing:-.02em;margin-bottom:1.1rem}
+        .hero-h1 .dim{color:#444;font-weight:300}
+        .hero-p{font-size:14px;color:#888;line-height:1.85;max-width:480px;margin-bottom:1.4rem}
+        .stream-blk{border-left:1px solid rgba(255,255,255,.09);padding-left:1rem}
+        .stream-ln{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4ade80;line-height:2.1;transition:opacity .3s}
+
+        /* COUNTDOWN */
+        .cd-box{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);padding:1.1rem;min-width:186px;flex-shrink:0}
+        .cd-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;letter-spacing:.15em;text-align:center;margin-bottom:10px;text-transform:uppercase}
+        .cd-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+        .cd-cell{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.05);padding:9px 4px;text-align:center}
+        .cd-num{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:500;line-height:1;color:#fff}
+        .cd-unit{font-family:'JetBrains Mono',monospace;font-size:8px;color:#3a3a3a;letter-spacing:.12em;margin-top:3px;text-transform:uppercase}
+        .cd-eta{font-family:'JetBrains Mono',monospace;font-size:9px;color:#4ade80;text-align:center;margin-top:8px;letter-spacing:.1em}
+
+        /* LOGO DIVIDER */
+        .logo-div{display:flex;justify-content:center;align-items:center;padding:40px 1.25rem 48px;gap:24px}
+        .logo-div-line{flex:1;height:1px;background:rgba(255,255,255,.05);max-width:200px}
+
+        /* FORM */
+        .fsec{max-width:740px;margin:0 auto 72px;padding:0 1.25rem}
+        .fcard{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02)}
+        .fcard-hdr{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.3);display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+        .fnum{font-family:'JetBrains Mono',monospace;font-size:10px;color:#444;border:1px solid rgba(255,255,255,.07);padding:2px 7px;flex-shrink:0;margin-top:1px}
+        .ftitle{font-size:14px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+        .fsub{font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;margin-top:2px}
+        .fbody{padding:20px;display:flex;flex-direction:column;gap:18px}
+        .ffooter{padding:0 20px 20px}
+
+        /* FIELDS */
+        .field{display:flex;flex-direction:column;gap:6px}
+        .flbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:#777;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .freq{color:#ef4444;font-size:8px}
+        .fhint{color:#444;font-size:9px;text-transform:none;letter-spacing:0}
+        .ferr{font-family:'JetBrains Mono',monospace;font-size:10px;color:#ef4444}
+        .fi,.fs,.fta{background:#0a0a0a;border:1px solid rgba(255,255,255,.11);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;padding:11px 12px;outline:none;border-radius:0;width:100%;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none}
+        .fi:focus,.fs:focus,.fta:focus{border-color:rgba(255,255,255,.32);background:#0e0e0e}
+        .fi::placeholder,.fta::placeholder{color:#2a2a2a}
+        .fi.e,.fs.e{border-color:rgba(239,68,68,.45)}
+        .fs{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='none' stroke='%23666' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+        .fs option{background:#111;color:#fff}
+
+        /* PRICE PILLS */
+        .pg{display:grid;gap:5px;grid-template-columns:repeat(5,1fr)}
+        .pp{font-family:'JetBrains Mono',monospace;font-size:10px;padding:10px 3px;border:none;cursor:pointer;border-radius:0;transition:all .15s;text-align:center}
+        .pp.on{background:#fff;color:#050505}
+        .pp.off{background:rgba(255,255,255,.04);color:#666}
+        .pp.off:hover{background:rgba(255,255,255,.08);color:#aaa}
+
+        /* CHIPS */
+        .chips{display:flex;flex-wrap:wrap;gap:5px}
+        .chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:7px 10px;border:none;border-radius:0;cursor:pointer;transition:all .15s}
+        .chip.on{background:#fff;color:#050505}
+        .chip.off{background:rgba(255,255,255,.04);color:#666}
+        .chip.off:hover{background:rgba(255,255,255,.09);color:#bbb}
+
+        /* SUBMIT */
+        .sbtn{width:100%;padding:15px 20px;background:#fff;color:#050505;border:none;border-radius:0;cursor:pointer;font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:9px;animation:glow 3s ease infinite}
+        .sbtn:hover{background:#ddd}
+        .sbtn:active{transform:scale(.99)}
+        .sbtn:disabled{background:#1a1a1a;color:#444;cursor:not-allowed;animation:none}
+        .snote{font-family:'JetBrains Mono',monospace;font-size:10px;color:#333;text-align:center;margin-top:10px;line-height:1.7}
+        .cur{display:inline-block;width:7px;height:12px;background:#4ade80;animation:blink 1s step-end infinite;vertical-align:middle;margin-left:1px}
+
+        /* SUCCESS */
+        .sw{padding:3rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:1.4rem;text-align:center}
+        .scheck{width:46px;height:46px;border:1px solid #4ade80;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .stitle{font-size:18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+        .sbody{font-family:'JetBrains Mono',monospace;font-size:11px;color:#777;line-height:1.9;max-width:380px}
+        .stag{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4ade80;border:1px solid rgba(74,222,128,.2);padding:7px 14px;letter-spacing:.1em}
+
+        /* PRODUCTS */
+        .psec{max-width:1080px;margin:0 auto 80px;padding:0 1.25rem}
+        .phdr{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+        .plbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:#333;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+        .prule{flex:1;height:1px;background:rgba(255,255,255,.05)}
+        .pcnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:#2a2a2a}
+        .pgrid{display:grid;gap:1px;background:rgba(255,255,255,.05);grid-template-columns:repeat(4,1fr)}
+        .pcard{background:#050505;padding:18px;position:relative;transition:background .2s}
+        .pcard:hover{background:#0b0b0b}
+        .pbadge{position:absolute;top:14px;right:12px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fbbf24;border:1px solid rgba(251,191,36,.2);padding:2px 6px;letter-spacing:.1em;text-transform:uppercase}
+        .pid{font-family:'JetBrains Mono',monospace;font-size:9px;color:#333;letter-spacing:.14em;margin-bottom:9px}
+        .pname{font-size:13px;font-weight:600;letter-spacing:.02em;margin-bottom:7px;line-height:1.35;padding-right:68px}
+        .pdesc{font-family:'JetBrains Mono',monospace;font-size:10px;color:#444;line-height:1.8;margin-bottom:12px}
+        .ptags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+        .ptag{font-family:'JetBrains Mono',monospace;font-size:9px;color:#333;border:1px solid rgba(255,255,255,.06);padding:2px 6px}
+        .peta{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4ade80}
+
+        /* FOOTER */
+        .ftr{border-top:1px solid rgba(255,255,255,.05);padding:26px 1.25rem;max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.25rem}
+        .ftl{display:flex;flex-direction:column;gap:4px}
+        .flr{display:flex;align-items:center;gap:7px}
+        .fbrand{font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+        .ftagline{font-family:'JetBrains Mono',monospace;font-size:10px;color:#333}
+        .ftr-r{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+        .fstat{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4ade80;display:flex;align-items:center;gap:6px}
+        .flink{font-family:'JetBrains Mono',monospace;font-size:10px;color:#333;text-decoration:none;transition:color .2s}
+        .flink:hover{color:#777}
+
+        /* RESPONSIVE */
+        @media(max-width:680px){
+          .hero-grid{grid-template-columns:1fr;gap:1.75rem}
+          .cd-box{min-width:unset;width:100%}
+          .cd-num{font-size:22px}
+          .ftr-r{align-items:flex-start}
+        }
+        @media(max-width:860px){.pgrid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:480px){
+          .pgrid{grid-template-columns:1fr}
+          .pg{grid-template-columns:repeat(3,1fr)}
+          .hero-h1{font-size:1.9rem}
+        }
+        @media(max-width:400px){
+          .pg{grid-template-columns:repeat(2,1fr)}
+          .hdr-status span:last-child{display:none}
+        }
+      `}</style>
+
+      {/* HEADER */}
+      <header className="hdr">
+        <a href="#" className="hdr-logo">
+          <Image src="/DrogueWorks_Logo.png" alt="DrogueWorks" width={30} height={30} style={{ objectFit: 'contain' }} />
+          <div className="hdr-wm">
+            <span className="hdr-b">DROGUE</span>
+            <span className="hdr-l">WORKS</span>
+          </div>
+        </a>
+        <div className="hdr-status">
+          <span className="sdot" />
+          <span>SYSTEMS NOMINAL</span>
         </div>
       </header>
 
-      {/* ── HERO ────────────────────────────────────────────── */}
-      <section style={{
-        maxWidth: 1100, margin: '0 auto', padding: '130px 2rem 80px',
-        opacity: visible ? 1 : 0, transition: 'opacity 0.7s ease',
-      }}>
-        {/* Label */}
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#888', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ display: 'inline-block', width: 24, height: 1, background: '#888' }} />
-          Mission Manifest / First Batch / June 2026
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '3rem', alignItems: 'start' }}>
+      {/* HERO */}
+      <section className={`hero${visible ? ' vis' : ''}`}>
+        <div className="hero-lbl">Mission Manifest / First Batch / June 2026</div>
+        <div className="hero-grid">
           <div>
-            <h1 style={{ fontSize: 'clamp(2.2rem,5vw,4rem)', fontWeight: 700, lineHeight: 1.0, letterSpacing: '-0.02em', marginBottom: '1.5rem' }}>
-              PRECISION<br />AVIONICS SLEDS<br />
-              <span style={{ color: '#888', fontWeight: 300 }}>FOR HIGH POWER ROCKETS.</span>
+            <h1 className="hero-h1">
+              PRECISION<br />
+              AVIONICS SLEDS<br />
+              <span className="dim">FOR HIGH POWER ROCKETS.</span>
             </h1>
-            <p style={{ fontSize: 15, color: '#aaa', lineHeight: 1.8, maxWidth: 560, marginBottom: 28 }}>
+            <p className="hero-p">
               First batch of custom 4&quot; Eggtimer Quantum sleds shipping June 2026.
-              Built with tight tolerances, installed heat-set inserts, and full
-              Mission Manifest documentation.
+              Built with tight tolerances, installed heat-set inserts, and full Mission Manifest documentation.
             </p>
-
-            {/* Terminal stream */}
-            <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '1.2rem' }}>
+            <div className="stream-blk">
               {streamLines.map((line, i) => (
-                <div key={i} style={{
-                  fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
-                  color: '#4ade80', lineHeight: 2.0,
-                  opacity: i === streamLines.length - 1 ? 1 : 0.35,
-                  transition: 'opacity 0.3s',
-                }}>{line}</div>
+                <div key={i} className="stream-ln" style={{ opacity: i === streamLines.length - 1 ? 1 : 0.25 }}>
+                  {line}
+                </div>
               ))}
             </div>
           </div>
 
           {/* Countdown */}
-          <div style={{
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: 'rgba(255,255,255,0.02)',
-            padding: '1.5rem',
-            minWidth: 220,
-          }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: '#888', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 16, textAlign: 'center' }}>
-              First Batch Ships In
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              {[
-                ['DAYS',    countdown.days],
-                ['HOURS',   countdown.hours],
-                ['MIN',     countdown.minutes],
-                ['SEC',     countdown.seconds],
-              ].map(([label, val]) => (
-                <div key={label as string} style={{ padding: '12px 8px', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center', background: 'rgba(0,0,0,0.3)' }}>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 28, fontWeight: 500, color: '#fff', lineHeight: 1 }}>
-                    {String(val).padStart(2, '0')}
-                  </div>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: '#555', letterSpacing: '0.15em', marginTop: 4 }}>
-                    {label}
-                  </div>
+          <div className="cd-box">
+            <div className="cd-lbl">First Batch Ships In</div>
+            <div className="cd-grid">
+              {([['DAYS', cd.days], ['HRS', cd.hours], ['MIN', cd.minutes], ['SEC', cd.seconds]] as [string, number][]).map(([l, v]) => (
+                <div key={l} className="cd-cell">
+                  <div className="cd-num">{String(v).padStart(2, '0')}</div>
+                  <div className="cd-unit">{l}</div>
                 </div>
               ))}
             </div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: '#4ade80', textAlign: 'center', marginTop: 12, letterSpacing: '0.1em' }}>
-              TARGET: 01 JUNE 2026
-            </div>
+            <div className="cd-eta">TARGET: 01 JUNE 2026</div>
           </div>
         </div>
       </section>
 
-      {/* ── WAITLIST FORM ────────────────────────────────────── */}
-      <section style={{ maxWidth: 780, margin: '0 auto 80px', padding: '0 2rem' }}>
-        <div style={{ border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.02)' }}>
+      {/* LOGO DIVIDER */}
+      <div className="logo-div">
+        <div className="logo-div-line" />
+        <Image
+          src="/DrogueWorks_Logo.png"
+          alt="DrogueWorks"
+          width={130}
+          height={130}
+          style={{ objectFit: 'contain', width: 'clamp(100px,22vw,130px)', height: 'auto', opacity: 0.9 }}
+        />
+        <div className="logo-div-line" />
+      </div>
 
-          {/* Form header */}
-          <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', border: '1px solid rgba(255,255,255,0.08)', padding: '2px 8px' }}>
-              01
-            </span>
+      {/* WAITLIST FORM */}
+      <section className="fsec">
+        <div className="fcard">
+          <div className="fcard-hdr">
+            <span className="fnum">01</span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                Join the Waitlist
-              </div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#888', marginTop: 2 }}>
-                Early access + launch discount for pilot cohort
-              </div>
+              <div className="ftitle">Join the Waitlist</div>
+              <div className="fsub">Early access + launch discount for pilot cohort</div>
             </div>
           </div>
 
           {submitted ? (
-            /* ── SUCCESS ── */
-            <div style={{ padding: '3rem 2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ width: 48, height: 48, border: '1px solid #4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="sw">
+              <div className="scheck">
                 <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
                   <polyline points="1,7 7,13 19,1" stroke="#4ade80" strokeWidth="1.5" strokeLinecap="square" />
                 </svg>
               </div>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
-                  Systems Nominal.
-                </div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#888', lineHeight: 1.9, maxWidth: 420 }}>
-                  You&apos;re on the list. We&apos;ll notify you when the first sleds drop — and you&apos;ll get first access plus a launch discount.
+                <div className="stitle">Systems Nominal.</div>
+                <div className="sbody">
+                  You&apos;re on the list. We&apos;ll notify you when the first sleds drop —
+                  first access plus a launch discount.
                 </div>
               </div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#4ade80', border: '1px solid rgba(74,222,128,0.25)', padding: '8px 16px', letterSpacing: '0.12em' }}>
-                [MANIFEST_ACCEPTED] — PILOT COHORT +1
-              </div>
+              <div className="stag">[MANIFEST_ACCEPTED] — PILOT COHORT +1</div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate>
-              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div className="fbody">
 
-                {/* Email */}
-                <Field label="Email Address" required error={errors.email}>
-                  <input
-                    type="email"
-                    value={form.email}
+                <div className="field">
+                  <label className="flbl">Email Address <span className="freq">✱</span></label>
+                  <input type="email" value={form.email} placeholder="pilot@example.com"
+                    className={`fi${errors.email ? ' e' : ''}`}
                     onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setErrors(p => ({ ...p, email: undefined })) }}
-                    placeholder="pilot@example.com"
-                    style={inputStyle(!!errors.email)}
                   />
-                </Field>
+                  {errors.email && <span className="ferr">✕ {errors.email}</span>}
+                </div>
 
-                {/* Sled size */}
-                <Field label="What size sled are you most interested in?" required error={errors.sled_size}>
-                  <SelectInput
-                    value={form.sled_size}
-                    onChange={v => { setForm(p => ({ ...p, sled_size: v })); setErrors(p => ({ ...p, sled_size: undefined })) }}
-                    error={!!errors.sled_size}
-                    options={[
-                      { value: '', label: '— SELECT AIRFRAME SIZE —' },
-                      { value: '54mm', label: '54mm (2.1") — 38mm motor tube compatible' },
-                      { value: '75mm', label: '75mm (3") — Mid-power to L1' },
-                      { value: '98mm', label: '98mm (4") — L1 / L2 certified flights' },
-                      { value: 'other', label: 'Other / Not sure yet' },
-                    ]}
-                  />
-                </Field>
+                <div className="field">
+                  <label className="flbl">Sled size you&apos;re most interested in <span className="freq">✱</span></label>
+                  <select value={form.sled_size} className={`fs${errors.sled_size ? ' e' : ''}`}
+                    onChange={e => { setForm(p => ({ ...p, sled_size: e.target.value })); setErrors(p => ({ ...p, sled_size: undefined })) }}
+                  >
+                    <option value="">— SELECT AIRFRAME SIZE —</option>
+                    <option value="54mm">54mm (2.1") — 38mm motor compatible</option>
+                    <option value="75mm">75mm (3") — Mid-power to L1</option>
+                    <option value="98mm">98mm (4") — L1 / L2 certified</option>
+                    <option value="other">Other / Not sure yet</option>
+                  </select>
+                  {errors.sled_size && <span className="ferr">✕ {errors.sled_size}</span>}
+                </div>
 
-                {/* Altimeters multi-select */}
-                <Field label="Which altimeter(s) do you need sleds for?" hint="Select all that apply">
-                  <MultiSelect
-                    selected={form.altimeters}
-                    onToggle={v => toggleMulti('altimeters', v)}
-                    options={[
-                      'Eggtimer Quantum',
-                      'Stratologger CF',
-                      'Altus Metrum Raven',
-                      'Missile Works RRC3',
-                      'Featherweight GPS',
-                      'Other',
-                    ]}
-                  />
-                </Field>
-
-                {/* Price range */}
-                <Field label="What would you pay for a premium custom sled?" required error={errors.price_range}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                    {['Under $35', '$35–$45', '$46–$55', '$56–$70', '$70+'].map(opt => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => { setForm(p => ({ ...p, price_range: opt })); setErrors(p => ({ ...p, price_range: undefined })) }}
-                        style={{
-                          fontFamily: "'JetBrains Mono', monospace",
-                          fontSize: 11, padding: '10px 4px', border: 'none', cursor: 'pointer',
-                          background: form.price_range === opt ? '#fff' : 'rgba(255,255,255,0.04)',
-                          color: form.price_range === opt ? '#050505' : '#888',
-                          borderRadius: 0,
-                          outline: errors.price_range ? '1px solid rgba(239,68,68,0.5)' : 'none',
-                          transition: 'all 0.15s',
-                          letterSpacing: '0.03em',
-                        }}
-                      >{opt}</button>
+                <div className="field">
+                  <label className="flbl">Altimeter(s) you need sleds for <span className="fhint">— select all that apply</span></label>
+                  <div className="chips">
+                    {['Eggtimer Quantum', 'Stratologger CF', 'Altus Metrum Raven', 'Missile Works RRC3', 'Featherweight GPS', 'Other'].map(opt => (
+                      <button key={opt} type="button" onClick={() => toggleMulti('altimeters', opt)}
+                        className={`chip ${form.altimeters.includes(opt) ? 'on' : 'off'}`}>{opt}</button>
                     ))}
                   </div>
-                </Field>
+                </div>
 
-                {/* Other hardware multi-select */}
-                <Field label="Interested in other DrogueWorks hardware?" hint="Select all that apply">
-                  <MultiSelect
-                    selected={form.other_hardware}
-                    onToggle={v => toggleMulti('other_hardware', v)}
-                    options={[
-                      'Fin alignment jigs',
-                      'Full AV bay kits',
-                      'Switch mounts',
-                      'Battery trays',
-                      'Nose cone bulkheads',
-                    ]}
-                  />
-                </Field>
+                <div className="field">
+                  <label className="flbl">What would you pay for a premium custom sled? <span className="freq">✱</span></label>
+                  <div className="pg">
+                    {['Under $35', '$35–$45', '$46–$55', '$56–$70', '$70+'].map(opt => (
+                      <button key={opt} type="button"
+                        onClick={() => { setForm(p => ({ ...p, price_range: opt })); setErrors(p => ({ ...p, price_range: undefined })) }}
+                        className={`pp ${form.price_range === opt ? 'on' : 'off'}`}>{opt}</button>
+                    ))}
+                  </div>
+                  {errors.price_range && <span className="ferr">✕ {errors.price_range}</span>}
+                </div>
+
+                <div className="field">
+                  <label className="flbl">Other hardware you&apos;re interested in <span className="fhint">— select all that apply</span></label>
+                  <div className="chips">
+                    {['Fin alignment jigs', 'Full AV bay kits', 'Switch mounts', 'Battery trays', 'Nose cone bulkheads'].map(opt => (
+                      <button key={opt} type="button" onClick={() => toggleMulti('other_hardware', opt)}
+                        className={`chip ${form.other_hardware.includes(opt) ? 'on' : 'off'}`}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
 
               </div>
 
-              {/* Submit */}
-              <div style={{ padding: '0 24px 24px' }}>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{
-                    width: '100%', padding: '15px 24px',
-                    background: submitting ? '#333' : '#fff',
-                    color: submitting ? '#888' : '#050505',
-                    border: 'none', borderRadius: 0, cursor: submitting ? 'not-allowed' : 'pointer',
-                    fontFamily: "'Barlow', sans-serif",
-                    fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase',
-                    transition: 'background 0.15s',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  }}
-                >
-                  {submitting ? (
-                    <>
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: '0.1em' }}>TRANSMITTING</span>
-                      <span style={{ display: 'inline-block', width: 8, height: 13, background: '#4ade80', animation: 'blink 1s step-end infinite' }} />
-                    </>
-                  ) : (
-                    'Join the Waitlist — Get Early Access & Launch Discount →'
-                  )}
+              <div className="ffooter">
+                {errors._form && <div className="ferr" style={{ marginBottom: 12 }}>✕ {errors._form}</div>}
+                <button type="submit" className="sbtn" disabled={submitting}>
+                  {submitting
+                    ? <><span className="mono" style={{ fontSize: 11, letterSpacing: '.1em' }}>TRANSMITTING</span><span className="cur" /></>
+                    : 'Join the Waitlist — Get Early Access & Launch Discount →'
+                  }
                 </button>
-                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', textAlign: 'center', marginTop: 10, lineHeight: 1.7 }}>
-                  No spam. One email when sleds drop. Unsubscribe anytime.
-                </p>
+                <p className="snote">No spam. One email when sleds drop. Unsubscribe anytime.</p>
               </div>
             </form>
           )}
         </div>
       </section>
 
-      {/* ── PRODUCT CARDS ────────────────────────────────────── */}
-      <section style={{ maxWidth: 1100, margin: '0 auto 100px', padding: '0 2rem' }}>
-        <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Hardware Manifest
-          </div>
-          <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', letterSpacing: '0.1em' }}>
-            4 items
-          </div>
+      {/* PRODUCT CARDS */}
+      <section className="psec">
+        <div className="phdr">
+          <span className="plbl">Hardware Manifest</span>
+          <div className="prule" />
+          <span className="pcnt">4 items</span>
         </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 1, background: 'rgba(255,255,255,0.06)' }}>
-          {PRODUCTS.map(product => (
-            <div key={product.id} style={{ background: '#050505', padding: '20px', position: 'relative', transition: 'background 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#0a0a0a')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#050505')}
-            >
-              {/* Coming soon badge */}
-              <div style={{
-                position: 'absolute', top: 16, right: 16,
-                fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
-                color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)',
-                padding: '2px 7px', letterSpacing: '0.1em', textTransform: 'uppercase',
-              }}>
-                COMING SOON
-              </div>
-
-              {/* ID */}
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: '#555', letterSpacing: '0.15em', marginBottom: 12 }}>
-                {product.id}
-              </div>
-
-              {/* Name */}
-              <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', marginBottom: 8, lineHeight: 1.3, paddingRight: 80 }}>
-                {product.name}
-              </div>
-
-              {/* Desc */}
-              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#666', lineHeight: 1.75, marginBottom: 16 }}>
-                {product.desc}
-              </p>
-
-              {/* Tags */}
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-                {product.tags.map(tag => (
-                  <span key={tag} style={{
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
-                    color: '#555', border: '1px solid rgba(255,255,255,0.08)',
-                    padding: '2px 7px', letterSpacing: '0.08em',
-                  }}>{tag}</span>
-                ))}
-              </div>
-
-              {/* ETA */}
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#4ade80' }}>
-                ETA: {product.eta}
-              </div>
+        <div className="pgrid">
+          {PRODUCTS.map(p => (
+            <div key={p.id} className="pcard">
+              <span className="pbadge">COMING SOON</span>
+              <div className="pid">{p.id}</div>
+              <div className="pname">{p.name}</div>
+              <p className="pdesc">{p.desc}</p>
+              <div className="ptags">{p.tags.map(t => <span key={t} className="ptag">{t}</span>)}</div>
+              <div className="peta">ETA: {p.eta}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────── */}
-      <footer style={{
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        maxWidth: 1100, margin: '0 auto', padding: '28px 2rem',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
-      }}>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase' }}>DROGUEWORKS</div>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', marginTop: 4 }}>
-            Parametric hardware for high-power rocketry
+      {/* FOOTER */}
+      <footer className="ftr">
+        <div className="ftl">
+          <div className="flr">
+            <Image src="/DrogueWorks_Logo.png" alt="" width={20} height={20} style={{ objectFit: 'contain', opacity: 0.6 }} />
+            <span className="fbrand">DrogueWorks</span>
           </div>
+          <div className="ftagline">Parametric hardware for high-power rocketry</div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', animation: 'pulse 2s infinite', display: 'inline-block' }} />
-            Hardware Status: Operational
-          </div>
-          <a href="https://github.com/trumanheaston-lab/DrogueWorks" target="_blank" rel="noopener noreferrer"
-            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#555', textDecoration: 'none' }}>
+        <div className="ftr-r">
+          <div className="fstat"><span className="sdot" />Hardware Status: Operational</div>
+          <a href="https://github.com/trumanheaston-lab/DrogueWorks" target="_blank" rel="noopener noreferrer" className="flink">
             github.com/trumanheaston-lab/DrogueWorks →
           </a>
         </div>
       </footer>
-
-      {/* Global styles */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #050505; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 0; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-        @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
-        input::placeholder { color: #444; }
-        input:focus { outline: none; }
-        select:focus { outline: none; }
-        @media (max-width: 680px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
-          .price-grid { grid-template-columns: repeat(3,1fr) !important; }
-          .countdown-grid { grid-template-columns: repeat(4,1fr) !important; }
-        }
-      `}</style>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────
-// Sub-components
-// ─────────────────────────────────────────────────────────────────
-
-function Field({ label, required, hint, error, children }: {
-  label: string; required?: boolean; hint?: string; error?: string; children: React.ReactNode
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-      <label style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}>
-        {label}
-        {required && <span style={{ color: '#ef4444', fontSize: 8 }}>✱</span>}
-        {hint && <span style={{ color: '#555', fontSize: 9, textTransform: 'none', letterSpacing: 0 }}> — {hint}</span>}
-      </label>
-      {children}
-      {error && <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#ef4444' }}>✕ {error}</span>}
-    </div>
-  )
-}
-
-function inputStyle(error: boolean): React.CSSProperties {
-  return {
-    background: '#0a0a0a', border: `1px solid ${error ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.12)'}`,
-    color: '#fff', fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
-    padding: '10px 12px', outline: 'none', borderRadius: 0, width: '100%',
-  }
-}
-
-function SelectInput({ value, onChange, options, error }: {
-  value: string; onChange: (v: string) => void
-  options: { value: string; label: string }[]; error: boolean
-}) {
-  return (
-    <select
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      style={{
-        ...inputStyle(error),
-        cursor: 'pointer', appearance: 'none',
-        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E")`,
-        backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center',
-        paddingRight: 32,
-      }}
-    >
-      {options.map(o => <option key={o.value} value={o.value} style={{ background: '#111' }}>{o.label}</option>)}
-    </select>
-  )
-}
-
-function MultiSelect({ selected, onToggle, options }: {
-  selected: string[]; onToggle: (v: string) => void; options: string[]
-}) {
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-      {options.map(opt => {
-        const active = selected.includes(opt)
-        return (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => onToggle(opt)}
-            style={{
-              fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
-              padding: '7px 12px', border: 'none', borderRadius: 0, cursor: 'pointer',
-              background: active ? '#fff' : 'rgba(255,255,255,0.05)',
-              color: active ? '#050505' : '#888',
-              transition: 'all 0.15s',
-              letterSpacing: '0.03em',
-            }}
-          >{opt}</button>
-        )
-      })}
-    </div>
+    </>
   )
 }
