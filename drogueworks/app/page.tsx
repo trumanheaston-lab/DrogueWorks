@@ -283,7 +283,7 @@ export default function ComingSoonPage() {
       {/* HEADER */}
       <header className="hdr">
         <a href="#" className="hdr-logo">
-          <Image src="/DrogueWorks_Logo.png" alt="DrogueWorks" width={60} height={60} style={{ objectFit: 'contain' }} />
+          <Image src="/DrogueWorks_Logo.png" alt="DrogueWorks" width={30} height={30} style={{ objectFit: 'contain' }} />
           <div className="hdr-wm">
             <span className="hdr-b">DROGUE</span>
             <span className="hdr-l">WORKS</span>
@@ -340,8 +340,8 @@ export default function ComingSoonPage() {
         <Image
           src="/DrogueWorks_Logo.png"
           alt="DrogueWorks"
-          width={130}
-          height={130}
+          width={260}
+          height={260}
           style={{ objectFit: 'contain', width: 'clamp(100px,22vw,130px)', height: 'auto', opacity: 0.9 }}
         />
         <div className="logo-div-line" />
