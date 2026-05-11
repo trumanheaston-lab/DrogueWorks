@@ -1,11 +1,11 @@
-'use client'
+‘use client’
 
 import { useState, useEffect, useRef } from ‘react’
 import Image from ‘next/image’
 
 const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? ‘’
 
-// ─── SURVEY FORM STATE ────────────────────────────────────────────
+// — SURVEY FORM STATE ––––––––––––––––––––––
 interface SurveyState {
 altimeters: string[]
 pain_points: string[]
@@ -28,7 +28,7 @@ q7_open: ‘’,
 email: ‘’,
 }
 
-// ─── DATA ─────────────────────────────────────────────────────────
+// — DATA ———————————————————
 const PRODUCTS = [
 {
 id: ‘DW-QS4’,
@@ -59,12 +59,12 @@ id: ‘DW-FJ4’,
 status: ‘In Design’,
 statusColor: ‘#3d9be9’,
 name: ‘Fin Alignment Jig’,
-desc: ‘Repeatable 90° fin placement for 54–98mm tubes. Designed to eliminate fin cant without a full-size build jig.’,
+desc: ‘Repeatable 90deg fin placement for 54–98mm tubes. Designed to eliminate fin cant without a full-size build jig.’,
 tags: [‘Alignment’, ‘Universal’, ‘Ground support’],
 },
 {
 id: ‘DW-AVB’,
-status: ‘Idea — Need Input’,
+status: ‘Idea – Need Input’,
 statusColor: ‘#5a7080’,
 name: ‘Full AV Bay Kit’,
 desc: ‘Sled + matched bulkheads + all-thread + hardware. Ships ready to stuff. Is this something you’d actually buy?’,
@@ -72,10 +72,10 @@ tags: [‘Complete kit’, ‘TBD’],
 },
 {
 id: ‘DW-???’,
-status: ‘Idea — Need Input’,
+status: ‘Idea – Need Input’,
 statusColor: ‘#5a7080’,
 name: ‘What Else?’,
-desc: “Seriously — what’s the thing that drives you crazy when you’re building? Tell me in the survey below.”,
+desc: “Seriously – what’s the thing that drives you crazy when you’re building? Tell me in the survey below.”,
 tags: [‘Community-defined’],
 },
 ]
@@ -101,7 +101,7 @@ badgeBg: ‘rgba(232,93,38,0.12)’,
 date: ‘2026 Q2’,
 title: ‘First Batch Ships’,
 desc: ‘4” Quantum and Raven sleds. Small batch to early supporters. Survey respondents get first access.’,
-badge: ‘Planned · Jun 2026’,
+badge: ‘Planned . Jun 2026’,
 badgeColor: ‘#5a7080’,
 badgeBg: ‘rgba(90,112,128,0.15)’,
 },
@@ -109,13 +109,13 @@ badgeBg: ‘rgba(90,112,128,0.15)’,
 date: ‘2026 Q3’,
 title: ‘What the Community Told Me to Build’,
 desc: “Whatever this survey points to. Genuinely. If 40 people say they need 75mm sleds for the Stratologger, that’s next.”,
-badge: ‘Planned · TBD’,
+badge: ‘Planned . TBD’,
 badgeColor: ‘#5a7080’,
 badgeBg: ‘rgba(90,112,128,0.15)’,
 },
 ]
 
-// ─── TOGGLE HELPER ────────────────────────────────────────────────
+// — TOGGLE HELPER ————————————————
 function toggleItem(arr: string[], val: string): string[] {
 return arr.includes(val) ? arr.filter(v => v !== val) : […arr, val]
 }
@@ -160,7 +160,7 @@ await new Promise(r => setTimeout(r, 700))
 }
 setSubmitted(true)
 } catch {
-setFormError(‘Submission failed — please try again.’)
+setFormError(‘Submission failed – please try again.’)
 } finally {
 setSubmitting(false)
 }
@@ -169,7 +169,7 @@ setSubmitting(false)
 return (
 <>
 <style>{`
-/* ── TOKENS ─────────────────────────────────────── */
+/*  TOKENS  */
 :root {
 –accent:  #e85d26;
 –accent2: #3d9be9;
@@ -184,7 +184,7 @@ return (
 }
 
 ```
-    /* ── NOISE OVERLAY ──────────────────────────────── */
+    /*  NOISE OVERLAY  */
     body::before {
       content:'';
       position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -192,19 +192,19 @@ return (
       background-size:200px 200px;opacity:0.35;
     }
 
-    /* ── ANIMATIONS ─────────────────────────────────── */
+    /*  ANIMATIONS  */
     @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
     @keyframes blink       { 0%,100%{opacity:1} 50%{opacity:0} }
     @keyframes fadeUp      { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
     @keyframes accentSlide { from{width:0} to{width:32px} }
 
-    /* ── SCAN LINES ─────────────────────────────────── */
+    /*  SCAN LINES  */
     .scan-bg {
       background-image:
         repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px);
     }
 
-    /* ── HEADER ─────────────────────────────────────── */
+    /*  HEADER  */
     .hdr {
       position:fixed;top:0;left:0;right:0;z-index:100;height:54px;
       display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;
@@ -224,7 +224,7 @@ return (
       animation:statusPulse 2.4s ease-in-out infinite;
     }
 
-    /* ── HERO ───────────────────────────────────────── */
+    /*  HERO  */
     .hero {
       padding:100px 1.5rem 72px;max-width:900px;margin:0 auto;
       opacity:0;transition:opacity .7s ease;position:relative;z-index:1;
@@ -271,7 +271,7 @@ return (
       font-family:'JetBrains Mono',monospace;font-size:10px;color:#2a2a2a;letter-spacing:.08em;
     }
 
-    /* ── SECTION HELPERS ────────────────────────────── */
+    /*  SECTION HELPERS  */
     .wrap { max-width:900px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1 }
     .sec-label {
       font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;
@@ -296,7 +296,7 @@ return (
       transition:opacity .6s ease,transform .6s ease;
     }
 
-    /* ── ABOUT ──────────────────────────────────────── */
+    /*  ABOUT  */
     .about { padding:72px 0;border-bottom:1px solid var(--border) }
     .about-grid {
       display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;
@@ -321,7 +321,7 @@ return (
       font-family:'JetBrains Mono',monospace;font-size:9px;color:#333;letter-spacing:.08em;
     }
 
-    /* ── MANIFESTO ──────────────────────────────────── */
+    /*  MANIFESTO  */
     .manifesto {
       background:var(--bg1);border-top:1px solid var(--border);
       border-bottom:1px solid var(--border);padding:56px 1.5rem;
@@ -337,7 +337,7 @@ return (
       font-size:9px;color:#333;letter-spacing:.12em;
     }
 
-    /* ── PRODUCT CARDS ──────────────────────────────── */
+    /*  PRODUCT CARDS  */
     .building { padding:72px 0;border-bottom:1px solid var(--border) }
     .building-intro {
       max-width:520px;font-size:13px;font-weight:300;color:#666;
@@ -366,7 +366,7 @@ return (
       border:1px solid rgba(255,255,255,.06);padding:2px 6px;
     }
 
-    /* ── SURVEY ─────────────────────────────────────── */
+    /*  SURVEY  */
     .survey { padding:80px 0 96px;background:var(--bg1);border-bottom:1px solid var(--border) }
     .survey-header { max-width:540px;margin:0 auto 52px;text-align:center;padding:0 1.5rem }
     .survey-header p { font-size:13px;font-weight:300;color:#777;line-height:1.85;margin-top:14px }
@@ -472,7 +472,7 @@ return (
     .sbody  { font-family:'JetBrains Mono',monospace;font-size:11px;color:#555;line-height:1.9;max-width:360px }
     .stag   { font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);border:1px solid rgba(62,207,142,.2);padding:6px 14px;letter-spacing:.1em }
 
-    /* ── TIMELINE ───────────────────────────────────── */
+    /*  TIMELINE  */
     .roadmap { padding:72px 0;border-bottom:1px solid var(--border) }
     .roadmap-intro { max-width:480px;font-size:13px;font-weight:300;color:#666;line-height:1.85;margin-bottom:36px }
     .timeline { display:flex;flex-direction:column }
@@ -490,7 +490,7 @@ return (
       padding:3px 8px;margin-top:8px;
     }
 
-    /* ── FOOTER ─────────────────────────────────────── */
+    /*  FOOTER  */
     .ftr {
       border-top:1px solid var(--border);padding:32px 1.5rem;
       max-width:900px;margin:0 auto;
@@ -512,7 +512,7 @@ return (
     .ftr-link:hover { color:#777 }
     .ftr-copy { font-family:'JetBrains Mono',monospace;font-size:9px;color:#1a1a1a;margin-top:4px }
 
-    /* ── RESPONSIVE ─────────────────────────────────── */
+    /*  RESPONSIVE  */
     @media(max-width:680px) {
       .about-grid { grid-template-columns:1fr;gap:40px }
       .tl-item { grid-template-columns:1fr;gap:4px }
@@ -524,7 +524,7 @@ return (
     }
   `}</style>
 
-  {/* ── HEADER ─────────────────────────────────────────────────── */}
+  {/*  HEADER  */}
   <header className="hdr">
     <a href="#" className="hdr-logo" aria-label="DrogueWorks Home">
       <Image src="/DrogueWorks_Logo.png" alt="DrogueWorks logo" width={28} height={28} style={{ objectFit: 'contain' }} priority />
@@ -539,17 +539,17 @@ return (
     </div>
   </header>
 
-  {/* ── HERO ───────────────────────────────────────────────────── */}
+  {/*  HERO  */}
   <section className={`hero scan-bg${visible ? ' vis' : ''}`} aria-label="Hero">
     <div className="hero-tag">High-Power Rocketry / Community Hardware</div>
     <h1>
       BUILDING BETTER<br />
-      TOOLS FOR ROCKETRY<span className="accent">—</span><br />
+      TOOLS FOR ROCKETRY<span className="accent">--</span><br />
       <span className="dim">ONE PROTOTYPE AT A TIME.</span>
     </h1>
     <p className="hero-body">
       I'm a maker who got tired of hunting for altimeter sleds that actually fit. So I started
-      building them. Now I want to know what <strong>you</strong> actually need — before I build
+      building them. Now I want to know what <strong>you</strong> actually need -- before I build
       the next thing. No hype. No storefront. Just a real person trying to make useful tools for
       the HPR community.
     </p>
@@ -558,12 +558,12 @@ return (
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
         Share Your Feedback
       </a>
-      <a href="#building" className="btn-ghost-lnk">See What's in Progress →</a>
+      <a href="#building" className="btn-ghost-lnk">See What's in Progress </a>
     </div>
     <p className="hero-note">// No spam. No sales pitch. Just a survey.</p>
   </section>
 
-  {/* ── ABOUT ──────────────────────────────────────────────────── */}
+  {/*  ABOUT  */}
   <section className="about section-border">
     <div className="wrap">
       <div className="about-grid">
@@ -578,7 +578,7 @@ return (
           <p>
             I'm not a company. I'm a person with a printer, some heat-set tooling, and a lot of
             patience for tight tolerances. I design parametric sleds that actually fit specific
-            altimeters — correct PCB footprint, correct boss pattern, correct terminal clearances.
+            altimeters -- correct PCB footprint, correct boss pattern, correct terminal clearances.
           </p>
           <p>
             <em>Right now I'm more interested in learning what you need than in selling you
@@ -592,9 +592,9 @@ return (
           style={{ transitionDelay: '.15s' }}
         >
           {[
-            { val: ['4', '"'], desc: 'First sled diameter — 98mm airframes' },
+            { val: ['4', '"'], desc: 'First sled diameter -- 98mm airframes' },
             { val: ['6', '+'], desc: 'Altimeters prototyped for so far' },
-            { val: ['ASA', ' / CFN'], desc: 'Materials — flight validated in test prints' },
+            { val: ['ASA', ' / CFN'], desc: 'Materials -- flight validated in test prints' },
             { val: ['0', '$'], desc: 'VC money. Self-funded, community-driven.' },
           ].map(({ val, desc }) => (
             <div key={desc} className="stat-row">
@@ -607,7 +607,7 @@ return (
     </div>
   </section>
 
-  {/* ── MANIFESTO ──────────────────────────────────────────────── */}
+  {/*  MANIFESTO  */}
   <div className="manifesto">
     <div className="manifesto-inner">
       <blockquote>
@@ -616,17 +616,17 @@ return (
         I&apos;d rather build ten things the community actually wants<br />
         than a hundred things I thought sounded good.&rdquo;
       </blockquote>
-      <div className="manifesto-sig">— Truman · DrogueWorks · Est. 2025</div>
+      <div className="manifesto-sig">-- Truman . DrogueWorks . Est. 2025</div>
     </div>
   </div>
 
-  {/* ── WHAT'S IN PROGRESS ─────────────────────────────────────── */}
+  {/*  WHAT'S IN PROGRESS  */}
   <section className="building" id="building">
     <div className="wrap">
       <span className="sec-label">// Hardware Manifest</span>
       <h2>What's in the Pipeline</h2>
       <p className="building-intro">
-        Honest statuses — not marketing ETAs. Some are prototypes I've already printed and tested.
+        Honest statuses -- not marketing ETAs. Some are prototypes I've already printed and tested.
         Some are still designs. A few are just ideas waiting to see if the community actually wants them.
       </p>
       <div className="product-grid">
@@ -652,7 +652,7 @@ return (
     </div>
   </section>
 
-  {/* ── SURVEY ─────────────────────────────────────────────────── */}
+  {/*  SURVEY  */}
   <section className="survey" id="survey">
     <div className="survey-header reveal-block" ref={el => addRevealRef(el, 10)}>
       <span className="sec-label">// Community Feedback</span>
@@ -684,10 +684,10 @@ return (
               <div className="stitle">Received. Thank you.</div>
               <div className="sbody">
                 This genuinely helps. I'll share what I learn with anyone who gave their
-                email — one update, no spam.
+                email -- one update, no spam.
               </div>
             </div>
-            <div className="stag">[SURVEY_LOGGED] — COMMUNITY +1</div>
+            <div className="stag">[SURVEY_LOGGED] -- COMMUNITY +1</div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate aria-label="Community survey">
@@ -695,7 +695,7 @@ return (
 
               {/* Q1 */}
               <div className="form-block">
-                <span className="flbl">01 — Altimeters</span>
+                <span className="flbl">01 -- Altimeters</span>
                 <span className="flbl-q">What altimeters do you use most?</span>
                 <span className="flbl-hint">Select all that apply.</span>
                 <div className="check-grid">
@@ -714,7 +714,7 @@ return (
 
               {/* Q2 */}
               <div className="form-block">
-                <span className="flbl">02 — Pain Points</span>
+                <span className="flbl">02 -- Pain Points</span>
                 <span className="flbl-q">What frustrates you most when building rockets?</span>
                 <span className="flbl-hint">Pick everything that's annoyed you.</span>
                 <div className="check-grid">
@@ -733,13 +733,13 @@ return (
 
               {/* Q3 */}
               <div className="form-block">
-                <span className="flbl">03 — Most Valuable</span>
+                <span className="flbl">03 -- Most Valuable</span>
                 <span className="flbl-q">What parts or tools would save you the most time or headaches?</span>
                 <textarea
                   className="fta"
                   value={survey.q3_time_savers}
                   onChange={e => setSurvey(p => ({ ...p, q3_time_savers: e.target.value }))}
-                  placeholder={'Be honest — vague answers are less useful than specific ones.\ne.g. "I always have to file down the sled edges to fit my LOC 4\\" tube"'}
+                  placeholder={'Be honest -- vague answers are less useful than specific ones.\ne.g. "I always have to file down the sled edges to fit my LOC 4\\" tube"'}
                 />
               </div>
 
@@ -747,7 +747,7 @@ return (
 
               {/* Q4 */}
               <div className="form-block">
-                <span className="flbl">04 — Airframe Diameters</span>
+                <span className="flbl">04 -- Airframe Diameters</span>
                 <span className="flbl-q">What sizes do you build most?</span>
                 <span className="flbl-hint">Select all that apply.</span>
                 <div className="check-grid">
@@ -766,14 +766,14 @@ return (
 
               {/* Q5 */}
               <div className="form-block">
-                <span className="flbl">05 — Willingness to Buy</span>
+                <span className="flbl">05 -- Willingness to Buy</span>
                 <span className="flbl-q">Would you pay for custom 3D printed parts, jigs, or AV bay solutions?</span>
                 <div className="radio-col">
                   {[
-                    ["yes_printed", "Yes — I'd buy printed flight-ready parts"],
-                    ["yes_files",   "Yes — but I'd rather buy the files and print myself"],
-                    ["maybe",       "Maybe — depends on price and quality"],
-                    ["no",          "No — I design and print my own"],
+                    ["yes_printed", "Yes -- I'd buy printed flight-ready parts"],
+                    ["yes_files",   "Yes -- but I'd rather buy the files and print myself"],
+                    ["maybe",       "Maybe -- depends on price and quality"],
+                    ["no",          "No -- I design and print my own"],
                   ].map(([val, label]) => (
                     <label key={val} className="radio-item">
                       <input type="radio" name="q5" value={val} checked={survey.q5_willingness === val}
@@ -789,7 +789,7 @@ return (
 
               {/* Q6 */}
               <div className="form-block">
-                <span className="flbl">06 — Your Level</span>
+                <span className="flbl">06 -- Your Level</span>
                 <span className="flbl-q">What's your current certification level?</span>
                 <div className="radio-col">
                   {[
@@ -812,7 +812,7 @@ return (
 
               {/* Q7 */}
               <div className="form-block">
-                <span className="flbl">07 — Open Mic</span>
+                <span className="flbl">07 -- Open Mic</span>
                 <span className="flbl-q">What's the thing nobody is building that you actually want?</span>
                 <textarea
                   className="fta"
@@ -827,7 +827,7 @@ return (
 
               {/* Email */}
               <div className="form-block">
-                <span className="flbl">08 — Stay in the Loop (Optional)</span>
+                <span className="flbl">08 -- Stay in the Loop (Optional)</span>
                 <span className="flbl-q">Drop your email if you want to hear what I find out from this survey.</span>
                 <span className="flbl-hint">One update email. No spam, ever.</span>
                 <input
@@ -843,11 +843,11 @@ return (
             </div>
 
             <div className="submit-row">
-              {formError && <div className="ferr" role="alert">✕ {formError}</div>}
+              {formError && <div className="ferr" role="alert"> {formError}</div>}
               <button type="submit" className="sbtn" disabled={submitting}>
                 {submitting
-                  ? <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '.1em' }}>TRANSMITTING…</span>
-                  : <>Send Feedback →</>
+                  ? <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, letterSpacing: '.1em' }}>TRANSMITTING</span>
+                  : <>Send Feedback </>
                 }
               </button>
               <p className="snote">// Anonymous unless you include your email</p>
@@ -858,7 +858,7 @@ return (
     </div>
   </section>
 
-  {/* ── ROADMAP ────────────────────────────────────────────────── */}
+  {/*  ROADMAP  */}
   <section className="roadmap section-border" id="roadmap">
     <div className="wrap">
       <span className="sec-label">// Mission Timeline</span>
@@ -891,7 +891,7 @@ return (
     </div>
   </section>
 
-  {/* ── FOOTER ─────────────────────────────────────────────────── */}
+  {/*  FOOTER  */}
   <footer className="ftr">
     <div>
       <div className="ftr-brand">DROGUE<span>WORKS</span></div>
@@ -899,7 +899,7 @@ return (
         Parametric hardware for high-power rocketry. Built by a maker, for the community.
         Honest about what's ready and what isn't.
       </div>
-      <div className="ftr-copy">© 2026 DrogueWorks · drogueworks.onrender.com</div>
+      <div className="ftr-copy">(c) 2026 DrogueWorks . drogueworks.onrender.com</div>
     </div>
     <div className="ftr-right">
       <div className="ftr-status">
@@ -912,9 +912,9 @@ return (
         rel="noopener noreferrer"
         className="ftr-link"
       >
-        github.com/trumanheaston-lab →
+        github.com/trumanheaston-lab 
       </a>
-      <a href="#survey" className="ftr-link">Take the Survey →</a>
+      <a href="#survey" className="ftr-link">Take the Survey </a>
     </div>
   </footer>
 </>
