@@ -1,11 +1,8 @@
-‘use client’
-
-import { useState, useEffect, useRef } from ‘react’
-import Image from ‘next/image’
-
-const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? ‘’
-
-// — SURVEY FORM STATE ––––––––––––––––––––––
+'use client'
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? ''
+// --- SURVEY FORM STATE --------------------------------------------
 interface SurveyState {
 altimeters: string[]
 pain_points: string[]
@@ -16,174 +13,166 @@ q6_cert_level: string
 q7_open: string
 email: string
 }
-
 const EMPTY_SURVEY: SurveyState = {
 altimeters: [],
 pain_points: [],
-q3_time_savers: ‘’,
+q3_time_savers: '',
 sizes: [],
-q5_willingness: ‘’,
-q6_cert_level: ‘’,
-q7_open: ‘’,
-email: ‘’,
+q5_willingness: '',
+q6_cert_level: '',
+q7_open: '',
+email: '',
 }
-
-// — DATA ———————————————————
+// --- DATA ---------------------------------------------------------
 const PRODUCTS = [
 {
-id: ‘DW-QS4’,
-status: ‘Prototype’,
-statusColor: ‘#e85d26’,
-name: ‘4” Eggtimer Quantum Sled’,
-desc: ‘Precision-fit for 98mm airframes. Heat-set inserts, dual battery bays, Quantum-specific PCB rails. First batch targeting June 2026.’,
-tags: [‘98mm’, ‘Quantum’, ‘Dual-deploy’],
+id: 'DW-QS4',
+status: 'Prototype',
+statusColor: '#e85d26',
+name: '4" Eggtimer Quantum Sled',
+desc: 'Precision-fit for 98mm airframes. Heat-set inserts, dual battery bays, Quantum-specific PCB rails. First batch targeting June 2026.',
+tags: ['98mm', 'Quantum', 'Dual-deploy'],
 },
 {
-id: ‘DW-RV4’,
-status: ‘Prototype’,
-statusColor: ‘#e85d26’,
-name: ‘4” Featherweight Raven Sled’,
-desc: ‘Built for the Raven 3 & 4. Correct PCB footprint and screw boss pattern. Terminal block clearances verified. Fits standard 98mm couplers.’,
-tags: [‘98mm’, ‘Raven 3/4’, ‘Dual-deploy’],
+id: 'DW-RV4',
+status: 'Prototype',
+statusColor: '#e85d26',
+
+name: '4" Featherweight Raven Sled',
+desc: 'Built for the Raven 3 & 4. Correct PCB footprint and screw boss pattern. Terminal block clearances verified. Fits standard 98mm couplers.',
+tags: ['98mm', 'Raven 3/4', 'Dual-deploy'],
 },
 {
-id: ‘DW-DS3’,
-status: ‘In Design’,
-statusColor: ‘#3d9be9’,
-name: ‘75mm Dual-Deploy Sled’,
-desc: ‘3” airframe sled, dual altimeter capable. Wire routing channel built in. Targeting most common L1 airframes.’,
-tags: [‘75mm’, ‘Dual altimeter’, ‘L1’],
+id: 'DW-DS3',
+status: 'In Design',
+statusColor: '#3d9be9',
+name: '75mm Dual-Deploy Sled',
+desc: '3" airframe sled, dual altimeter capable. Wire routing channel built in. Targeting most common L1 airframes.',
+tags: ['75mm', 'Dual altimeter', 'L1'],
 },
 {
-id: ‘DW-FJ4’,
-status: ‘In Design’,
-statusColor: ‘#3d9be9’,
-name: ‘Fin Alignment Jig’,
-desc: ‘Repeatable 90deg fin placement for 54–98mm tubes. Designed to eliminate fin cant without a full-size build jig.’,
-tags: [‘Alignment’, ‘Universal’, ‘Ground support’],
+id: 'DW-FJ4',
+status: 'In Design',
+statusColor: '#3d9be9',
+name: 'Fin Alignment Jig',
+desc: 'Repeatable 90deg fin placement for 54--98mm tubes. Designed to eliminate fin cant without a full-size build jig.',
+tags: ['Alignment', 'Universal', 'Ground support'],
 },
 {
-id: ‘DW-AVB’,
-status: ‘Idea – Need Input’,
-statusColor: ‘#5a7080’,
-name: ‘Full AV Bay Kit’,
-desc: ‘Sled + matched bulkheads + all-thread + hardware. Ships ready to stuff. Is this something you’d actually buy?’,
-tags: [‘Complete kit’, ‘TBD’],
+id: 'DW-AVB',
+status: 'Idea -- Need Input',
+statusColor: '#5a7080',
+name: 'Full AV Bay Kit',
+desc: 'Sled + matched bulkheads + all-thread + hardware. Ships ready to stuff. Is this something you'd actually buy?',
+tags: ['Complete kit', 'TBD'],
 },
 {
-id: ‘DW-???’,
-status: ‘Idea – Need Input’,
-statusColor: ‘#5a7080’,
-name: ‘What Else?’,
-desc: “Seriously – what’s the thing that drives you crazy when you’re building? Tell me in the survey below.”,
-tags: [‘Community-defined’],
+id: 'DW-???',
+status: 'Idea -- Need Input',
+statusColor: '#5a7080',
+name: 'What Else?',
+desc: "Seriously -- what's the thing that drives you crazy when you're building? Tell me in the survey below.",
+tags: ['Community-defined'],
 },
 ]
-
 const TIMELINE = [
 {
-date: ‘2025 Q4’,
-title: ‘First Prototypes Printed’,
-desc: ‘Started with 4” Eggtimer Quantum sleds. First prints, first failures, first good fits. Learned a lot about coupler tolerances and print orientation.’,
-badge: ‘Done’,
-badgeColor: ‘#3ecf8e’,
-badgeBg: ‘rgba(62,207,142,0.12)’,
+date: '2025 Q4',
+title: 'First Prototypes Printed',
+desc: 'Started with 4" Eggtimer Quantum sleds. First prints, first failures, first good fits. Learned a lot about coupler tolerances and print orientation.',
+badge: 'Done',
+badgeColor: '#3ecf8e',
+badgeBg: 'rgba(62,207,142,0.12)',
+},
+
+{
+date: '2026 Q1--Q2',
+title: 'Community Research',
+desc: 'This page. Asking real fliers what they actually need before building more. Survey results will be shared publicly once collected.',
+badge: 'Active Now',
+badgeColor: '#e85d26',
+badgeBg: 'rgba(232,93,38,0.12)',
 },
 {
-date: ‘2026 Q1–Q2’,
-title: ‘Community Research’,
-desc: ‘This page. Asking real fliers what they actually need before building more. Survey results will be shared publicly once collected.’,
-badge: ‘Active Now’,
-badgeColor: ‘#e85d26’,
-badgeBg: ‘rgba(232,93,38,0.12)’,
+date: '2026 Q2',
+title: 'First Batch Ships',
+desc: '4" Quantum and Raven sleds. Small batch to early supporters. Survey respondents get first access.',
+badge: 'Planned . Jun 2026',
+badgeColor: '#5a7080',
+badgeBg: 'rgba(90,112,128,0.15)',
 },
 {
-date: ‘2026 Q2’,
-title: ‘First Batch Ships’,
-desc: ‘4” Quantum and Raven sleds. Small batch to early supporters. Survey respondents get first access.’,
-badge: ‘Planned . Jun 2026’,
-badgeColor: ‘#5a7080’,
-badgeBg: ‘rgba(90,112,128,0.15)’,
-},
-{
-date: ‘2026 Q3’,
-title: ‘What the Community Told Me to Build’,
-desc: “Whatever this survey points to. Genuinely. If 40 people say they need 75mm sleds for the Stratologger, that’s next.”,
-badge: ‘Planned . TBD’,
-badgeColor: ‘#5a7080’,
-badgeBg: ‘rgba(90,112,128,0.15)’,
+date: '2026 Q3',
+title: 'What the Community Told Me to Build',
+desc: "Whatever this survey points to. Genuinely. If 40 people say they need 75mm sleds for the Stratologger, that's next.",
+badge: 'Planned . TBD',
+badgeColor: '#5a7080',
+badgeBg: 'rgba(90,112,128,0.15)',
 },
 ]
-
-// — TOGGLE HELPER ————————————————
+// --- TOGGLE HELPER ------------------------------------------------
 function toggleItem(arr: string[], val: string): string[] {
-return arr.includes(val) ? arr.filter(v => v !== val) : […arr, val]
+return arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]
 }
-
 export default function HomePage() {
 const [survey, setSurvey] = useState<SurveyState>(EMPTY_SURVEY)
 const [submitting, setSubmitting] = useState(false)
 const [submitted, setSubmitted] = useState(false)
-const [formError, setFormError] = useState(’’)
+const [formError, setFormError] = useState('')
 const [visible, setVisible] = useState(false)
 const revealRefs = useRef<(HTMLElement | null)[]>([])
-
 useEffect(() => { setTimeout(() => setVisible(true), 60) }, [])
-
 // Scroll reveal
 useEffect(() => {
 const observer = new IntersectionObserver(
-entries => entries.forEach(e => { if (e.isIntersecting) (e.target as HTMLElement).style.opacity = ‘1’, (e.target as HTMLElement).style.transform = ‘none’ }),
+entries => entries.forEach(e => { if (e.isIntersecting) (e.target as HTMLElement).style.opacity = '1', (e.target as HTMLElement).style.transform = 'none' }),
 { threshold: 0.1 }
 )
+
 revealRefs.current.forEach(el => { if (el) observer.observe(el) })
 return () => observer.disconnect()
 }, [])
-
 const addRevealRef = (el: HTMLElement | null, i: number) => { revealRefs.current[i] = el }
-
 const handleSubmit = async (e: React.FormEvent) => {
 e.preventDefault()
-setFormError(’’)
+setFormError('')
 setSubmitting(true)
 try {
 if (FORMSPREE_ID) {
 const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-method: ‘POST’,
-headers: { ‘Content-Type’: ‘application/json’, Accept: ‘application/json’ },
-body: JSON.stringify({ …survey, _subject: ‘DrogueWorks Community Survey’ }),
+method: 'POST',
+headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+body: JSON.stringify({ ...survey, _subject: 'DrogueWorks Community Survey' }),
 })
 if (!res.ok) throw new Error()
 } else {
-console.log(‘DrogueWorks Survey:’, JSON.stringify(survey, null, 2))
+console.log('DrogueWorks Survey:', JSON.stringify(survey, null, 2))
 await new Promise(r => setTimeout(r, 700))
 }
 setSubmitted(true)
 } catch {
-setFormError(‘Submission failed – please try again.’)
+setFormError('Submission failed -- please try again.')
 } finally {
 setSubmitting(false)
 }
 }
-
 return (
 <>
 <style>{`
 /* TOKENS */
 :root {
-–accent: #e85d26;
-–accent2: #3d9be9;
-–green: #3ecf8e;
-–bg: #050505;
-–bg1: #0a0a0a;
-–bg2: #111111;
-–border: rgba(255,255,255,0.07);
-–border2: rgba(255,255,255,0.13);
-–gray: #888888;
-–muted: #444444;
+--accent: #e85d26;
+--accent2: #3d9be9;
+--green: #3ecf8e;
+--bg: #050505;
+--bg1: #0a0a0a;
+--bg2: #111111;
+--border: rgba(255,255,255,0.07);
+--border2: rgba(255,255,255,0.13);
+--gray: #888888;
+--muted: #444444;
 }
 
-```
 /* NOISE OVERLAY */
 body::before {
 content:'';
@@ -191,19 +180,16 @@ position:fixed;inset:0;z-index:0;pointer-events:none;
 background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 background-size:200px 200px;opacity:0.35;
 }
-
 /* ANIMATIONS */
 @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
 @keyframes accentSlide { from{width:0} to{width:32px} }
-
 /* SCAN LINES */
 .scan-bg {
 background-image:
 repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.018) 39px,rgba(255,255,255,0.018) 40px);
 }
-
 /* HEADER */
 .hdr {
 position:fixed;top:0;left:0;right:0;z-index:100;height:54px;
@@ -223,7 +209,6 @@ display:flex;align-items:center;gap:7px;letter-spacing:.1em;
 width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;
 animation:statusPulse 2.4s ease-in-out infinite;
 }
-
 /* HERO */
 .hero {
 padding:100px 1.5rem 72px;max-width:900px;margin:0 auto;
@@ -231,6 +216,7 @@ opacity:0;transition:opacity .7s ease;position:relative;z-index:1;
 }
 .hero.vis { opacity:1 }
 .hero-tag {
+
 font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;
 text-transform:uppercase;color:var(--accent);margin-bottom:28px;
 display:flex;align-items:center;gap:12px;
@@ -270,7 +256,6 @@ display:inline-block;
 .hero-note {
 font-family:'JetBrains Mono',monospace;font-size:10px;color:#2a2a2a;letter-spacing:.08em;
 }
-
 /* SECTION HELPERS */
 .wrap { max-width:900px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1 }
 .sec-label {
@@ -278,6 +263,7 @@ font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;
 text-transform:uppercase;color:var(--accent2);margin-bottom:14px;
 display:block;
 }
+
 .sec-hdr-row {
 display:flex;align-items:center;gap:14px;margin-bottom:32px;
 }
@@ -295,7 +281,6 @@ line-height:1.1;margin-bottom:16px;
 opacity:0;transform:translateY(20px);
 transition:opacity .6s ease,transform .6s ease;
 }
-
 /* ABOUT */
 .about { padding:72px 0;border-bottom:1px solid var(--border) }
 .about-grid {
@@ -320,11 +305,11 @@ font-size:1.9rem;font-weight:800;letter-spacing:-.01em;color:#fff;
 .stat-desc {
 font-family:'JetBrains Mono',monospace;font-size:9px;color:#333;letter-spacing:.08em;
 }
-
 /* MANIFESTO */
 .manifesto {
 background:var(--bg1);border-top:1px solid var(--border);
 border-bottom:1px solid var(--border);padding:56px 1.5rem;
+
 }
 .manifesto-inner { max-width:660px;margin:0 auto;text-align:center }
 .manifesto blockquote {
@@ -336,7 +321,6 @@ line-height:2.1;color:#666;font-weight:300;
 margin-top:22px;font-family:'JetBrains Mono',monospace;
 font-size:9px;color:#333;letter-spacing:.12em;
 }
-
 /* PRODUCT CARDS */
 .building { padding:72px 0;border-bottom:1px solid var(--border) }
 .building-intro {
@@ -365,13 +349,13 @@ font-size:13px;font-weight:700;letter-spacing:.03em;color:#fff;margin-bottom:8px
 font-family:'JetBrains Mono',monospace;font-size:8px;color:#333;
 border:1px solid rgba(255,255,255,.06);padding:2px 6px;
 }
-
 /* SURVEY */
 .survey { padding:80px 0 96px;background:var(--bg1);border-bottom:1px solid var(--border) }
 .survey-header { max-width:540px;margin:0 auto 52px;text-align:center;padding:0 1.5rem }
 .survey-header p { font-size:13px;font-weight:300;color:#777;line-height:1.85;margin-top:14px }
 .fcard {
 border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.02);
+
 }
 .fcard-hdr {
 padding:18px 24px;border-bottom:1px solid var(--border);
@@ -395,7 +379,6 @@ font-size:14px;font-weight:500;color:#ddd;display:block;margin-bottom:2px;
 font-family:'Barlow',sans-serif;letter-spacing:0;text-transform:none;
 }
 .flbl-hint { font-size:12px;color:#444;margin-bottom:8px;display:block;font-family:'Barlow',sans-serif }
-
 /* checkboxes / radios */
 .check-grid {
 display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px;
@@ -419,6 +402,7 @@ border-top:none;border-left:none;transform:rotate(45deg);opacity:0;
 .check-item input:checked ~ .check-box { background:var(--accent);border-color:var(--accent) }
 .check-item input:checked ~ .check-box::after { opacity:1 }
 .check-item:has(input:checked) { border-color:var(--accent);background:rgba(232,93,38,.06) }
+
 .radio-dot {
 width:14px;height:14px;flex-shrink:0;border:1px solid rgba(255,255,255,.18);
 border-radius:50%;position:relative;transition:all .15s;
@@ -432,7 +416,6 @@ border-radius:50%;background:var(--accent);opacity:0;transition:opacity .15s;
 .radio-item input:checked ~ .radio-dot::after { opacity:1 }
 .radio-item:has(input:checked) { border-color:var(--accent);background:rgba(232,93,38,.06) }
 .check-label { font-size:12px;color:#aaa;user-select:none;font-family:'JetBrains Mono',monospace }
-
 /* textarea / email */
 .fta,.fi-email {
 width:100%;background:var(--bg);border:1px solid var(--border2);
@@ -442,7 +425,6 @@ padding:11px 14px;outline:none;border-radius:0;transition:border-color .2s,backg
 .fta:focus,.fi-email:focus { border-color:rgba(255,255,255,.3);background:var(--bg1) }
 .fta::placeholder,.fi-email::placeholder { color:#2a2a2a }
 .fta { resize:vertical;min-height:90px;line-height:1.8 }
-
 /* submit */
 .submit-row {
 padding:24px;border-top:1px solid var(--border);
@@ -458,7 +440,6 @@ transition:background .15s,transform .1s;display:flex;align-items:center;gap:8px
 .sbtn:disabled { background:#1a1a1a;color:#333;cursor:not-allowed }
 .snote { font-family:'JetBrains Mono',monospace;font-size:9px;color:#2a2a2a;line-height:1.7 }
 .ferr { font-family:'JetBrains Mono',monospace;font-size:10px;color:#ef4444 }
-
 /* success */
 .success-panel {
 padding:3rem 2rem;display:flex;flex-direction:column;
@@ -466,12 +447,12 @@ align-items:center;gap:1.25rem;text-align:center;
 }
 .scheck {
 width:44px;height:44px;border:1px solid var(--green);
+
 display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .stitle { font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase }
 .sbody { font-family:'JetBrains Mono',monospace;font-size:11px;color:#555;line-height:1.9;max-width:360px }
 .stag { font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);border:1px solid rgba(62,207,142,.2);padding:6px 14px;letter-spacing:.1em }
-
 /* TIMELINE */
 .roadmap { padding:72px 0;border-bottom:1px solid var(--border) }
 .roadmap-intro { max-width:480px;font-size:13px;font-weight:300;color:#666;line-height:1.85;margin-bottom:36px }
@@ -489,7 +470,6 @@ display:inline-block;font-family:'JetBrains Mono',monospace;
 font-size:9px;letter-spacing:.12em;text-transform:uppercase;
 padding:3px 8px;margin-top:8px;
 }
-
 /* FOOTER */
 .ftr {
 border-top:1px solid var(--border);padding:32px 1.5rem;
@@ -511,8 +491,8 @@ text-decoration:none;transition:color .2s;letter-spacing:.06em;
 }
 .ftr-link:hover { color:#777 }
 .ftr-copy { font-family:'JetBrains Mono',monospace;font-size:9px;color:#1a1a1a;margin-top:4px }
-
 /* RESPONSIVE */
+
 @media(max-width:680px) {
 .about-grid { grid-template-columns:1fr;gap:40px }
 .tl-item { grid-template-columns:1fr;gap:4px }
@@ -523,7 +503,6 @@ text-decoration:none;transition:color .2s;letter-spacing:.06em;
 .check-grid { grid-template-columns:1fr }
 }
 `}</style>
-
 {/* HEADER */}
 <header className="hdr">
 <a href="#" className="hdr-logo" aria-label="DrogueWorks Home">
@@ -538,7 +517,6 @@ text-decoration:none;transition:color .2s;letter-spacing:.06em;
 LISTENING MODE ACTIVE
 </div>
 </header>
-
 {/* HERO */}
 <section className={`hero scan-bg${visible ? ' vis' : ''}`} aria-label="Hero">
 <div className="hero-tag">High-Power Rocketry / Community Hardware</div>
@@ -560,9 +538,9 @@ Share Your Feedback
 </a>
 <a href="#building" className="btn-ghost-lnk">See What's in Progress </a>
 </div>
+
 <p className="hero-note">// No spam. No sales pitch. Just a survey.</p>
 </section>
-
 {/* ABOUT */}
 <section className="about section-border">
 <div className="wrap">
@@ -585,7 +563,6 @@ altimeters -- correct PCB footprint, correct boss pattern, correct terminal clea
 something.</em> The survey below is the whole point of this page.
 </p>
 </div>
-
 <div
 className="stats-col reveal-block"
 ref={el => addRevealRef(el, 0)}
@@ -619,7 +596,6 @@ than a hundred things I thought sounded good.&rdquo;
 <div className="manifesto-sig">-- Truman . DrogueWorks . Est. 2025</div>
 </div>
 </div>
-
 {/* WHAT'S IN PROGRESS */}
 <section className="building" id="building">
 <div className="wrap">
@@ -651,9 +627,9 @@ style={{ transitionDelay: `${i * 0.08}s` }}
 </div>
 </div>
 </section>
-
 {/* SURVEY */}
 <section className="survey" id="survey">
+
 <div className="survey-header reveal-block" ref={el => addRevealRef(el, 10)}>
 <span className="sec-label">// Community Feedback</span>
 <h2>What Do You Actually Need?</h2>
@@ -662,7 +638,6 @@ I'm not guessing what to build next. I'm asking. Fill this out and you'll direct
 what DrogueWorks builds in 2026. Takes about 3 minutes.
 </p>
 </div>
-
 <div className="wrap">
 <div className="fcard reveal-block" ref={el => addRevealRef(el, 11)}>
 <div className="fcard-hdr">
@@ -672,7 +647,6 @@ what DrogueWorks builds in 2026. Takes about 3 minutes.
 <div className="fsub">All responses anonymous unless you share your email</div>
 </div>
 </div>
-
 {submitted ? (
 <div className="success-panel">
 <div className="scheck" role="img" aria-label="Success">
@@ -692,7 +666,6 @@ email -- one update, no spam.
 ) : (
 <form onSubmit={handleSubmit} noValidate aria-label="Community survey">
 <div className="fbody">
-
 {/* Q1 */}
 <div className="form-block">
 <span className="flbl">01 -- Altimeters</span>
@@ -701,6 +674,7 @@ email -- one update, no spam.
 <div className="check-grid">
 {['Eggtimer Quantum','Eggtimer Proton','Featherweight Raven 3','Featherweight Raven 4','Stratologger CF','Altus Metrum','Missile Works RRC3','Other'].map(opt => (
 <label key={opt} className="check-item">
+
 <input type="checkbox" checked={survey.altimeters.includes(opt)}
 onChange={() => setSurvey(p => ({ ...p, altimeters: toggleItem(p.altimeters, opt) }))} />
 <span className="check-box" />
@@ -709,9 +683,7 @@ onChange={() => setSurvey(p => ({ ...p, altimeters: toggleItem(p.altimeters, opt
 ))}
 </div>
 </div>
-
 <div className="form-divider" />
-
 {/* Q2 */}
 <div className="form-block">
 <span className="flbl">02 -- Pain Points</span>
@@ -728,9 +700,7 @@ onChange={() => setSurvey(p => ({ ...p, pain_points: toggleItem(p.pain_points, o
 ))}
 </div>
 </div>
-
 <div className="form-divider" />
-
 {/* Q3 */}
 <div className="form-block">
 <span className="flbl">03 -- Most Valuable</span>
@@ -742,12 +712,11 @@ onChange={e => setSurvey(p => ({ ...p, q3_time_savers: e.target.value }))}
 placeholder={'Be honest -- vague answers are less useful than specific ones.\ne.g. "I always have to file down the sled edges to fit my LOC 4\\" tube"'}
 />
 </div>
-
 <div className="form-divider" />
-
 {/* Q4 */}
 <div className="form-block">
 <span className="flbl">04 -- Airframe Diameters</span>
+
 <span className="flbl-q">What sizes do you build most?</span>
 <span className="flbl-hint">Select all that apply.</span>
 <div className="check-grid">
@@ -761,9 +730,7 @@ onChange={() => setSurvey(p => ({ ...p, sizes: toggleItem(p.sizes, opt) }))} />
 ))}
 </div>
 </div>
-
 <div className="form-divider" />
-
 {/* Q5 */}
 <div className="form-block">
 <span className="flbl">05 -- Willingness to Buy</span>
@@ -784,9 +751,7 @@ onChange={() => setSurvey(p => ({ ...p, q5_willingness: val }))} />
 ))}
 </div>
 </div>
-
 <div className="form-divider" />
-
 {/* Q6 */}
 <div className="form-block">
 <span className="flbl">06 -- Your Level</span>
@@ -795,6 +760,7 @@ onChange={() => setSurvey(p => ({ ...p, q5_willingness: val }))} />
 {[
 ["uncertified", "Uncertified / just starting out"],
 ["L1", "L1 certified"],
+
 ["L2", "L2 certified"],
 ["L3", "L3 certified"],
 ].map(([val, label]) => (
@@ -807,9 +773,7 @@ onChange={() => setSurvey(p => ({ ...p, q6_cert_level: val }))} />
 ))}
 </div>
 </div>
-
 <div className="form-divider" />
-
 {/* Q7 */}
 <div className="form-block">
 <span className="flbl">07 -- Open Mic</span>
@@ -822,9 +786,7 @@ onChange={e => setSurvey(p => ({ ...p, q7_open: e.target.value }))}
 placeholder="No filter needed. Wild ideas welcome. This is the most useful question on the form."
 />
 </div>
-
 <div className="form-divider" />
-
 {/* Email */}
 <div className="form-block">
 <span className="flbl">08 -- Stay in the Loop (Optional)</span>
@@ -839,7 +801,6 @@ placeholder="you@example.com"
 autoComplete="email"
 />
 </div>
-
 </div>
 
 <div className="submit-row">
@@ -857,7 +818,6 @@ autoComplete="email"
 </div>
 </div>
 </section>
-
 {/* ROADMAP */}
 <section className="roadmap section-border" id="roadmap">
 <div className="wrap">
@@ -889,8 +849,8 @@ style={{ color: item.badgeColor, background: item.badgeBg }}
 ))}
 </div>
 </div>
-</section>
 
+</section>
 {/* FOOTER */}
 <footer className="ftr">
 <div>
@@ -918,4 +878,5 @@ github.com/trumanheaston-lab
 </div>
 </footer>
 </>
-```
+)
+}
